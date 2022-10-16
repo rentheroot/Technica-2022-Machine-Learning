@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 import os
 
@@ -14,6 +18,12 @@ def load_image(imgPath):
     img = img.reshape((img.shape[0] * img.shape[1], 3))
     return(img)
 
+# get ratio
+def get_ratio(img):
+    height = img.shape[0]
+    width = img.shape[1]
+    ratio = height / width
+    return(ratio)
 
 # identify most important colors
 def top_colors(img):
@@ -31,10 +41,11 @@ def top_colors(img):
 
     return (proportion, colors)
 
-def construct_dataframe(propList, colorList, folderList):
+def construct_dataframe(propList, colorList, folderList, ratioList):
     # dataframe struct
     d = {
         'Item': folderList,
+        'Ratio': ratioList,
         'color0c': [], 
         'color1c' : [], 
         'color2c' : [],
@@ -65,28 +76,47 @@ def construct_dataframe(propList, colorList, folderList):
 propList = []
 colorList = []
 folderList = []
+ratioList = []
 
 # Images Folder
-imgFolder = os.path.join(dirname, 'archiveFruit/fruits-360-original-size/fruits-360-original-size/Training/limitedselection')
+imgFolder = os.path.join(dirname, 'archiveFruit/fruits-360-original-size/fruits-360-original-size/Training/apples/')
 
 # Load images
 for root, dirs, files in os.walk(imgFolder):
     for dir in dirs:
 
         subfolder = os.path.join(imgFolder, dir)
+        print(subfolder)
 
         for filename in os.listdir(subfolder):
 
+            # get image color data
             img = load_image(os.path.join(subfolder, filename))
             proportions, colors = top_colors(img)
+
+            # get image ratio data
+            ratio = get_ratio(img)
+            ratioList.append(ratio)
 
             # append to lists
             propList.append(proportions)
             colorList.append(colors)
-            folderList.append(os.path.split(subfolder)[1])
 
-df = construct_dataframe(propList, colorList, folderList)
+            # normalize
+            category = os.path.split(subfolder)[1]
+            items = ['apple', 'carrot', 'pear', 'cabbage', 'eggplant', 'zucchini']
+
+            for i in items:
+                if i in category:
+                    folderList.append(i)
+
+           
+
+df = construct_dataframe(propList, colorList, folderList, ratioList)
+
+# serialize
 print(df)
+df.to_pickle('df5.pkl')
 
 
 
