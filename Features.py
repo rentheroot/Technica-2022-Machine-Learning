@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 from sklearn.cluster import KMeans
 import pandas as pd
+import os
+
+# file location
+dirname = os.path.dirname(__file__)
 
 # load image from disk
 def load_image(imgPath):
@@ -59,14 +63,17 @@ def construct_dataframe(propList, colorList):
 propList = []
 colorList = []
 
+# Image Folder
+imgFolder = os.path.join(dirname, 'archiveFruit/fruits-360-original-size/fruits-360-original-size/Training/limitedselection')
 
-# Load image
-img = load_image('r0_115.jpg')
-proportions, colors = top_colors(img)
+# Load images
+for filename in os.listdir(imgFolder):
+    img = load_image(os.path.join(imgFolder, filename))
+    proportions, colors = top_colors(img)
 
-# append to lists
-propList.append(proportions)
-colorList.append(colors)
+    # append to lists
+    propList.append(proportions)
+    colorList.append(colors)
 
 df = construct_dataframe(propList, colorList)
 print(df)
