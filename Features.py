@@ -31,9 +31,11 @@ def top_colors(img):
 
     return (proportion, colors)
 
-def construct_dataframe(propList, colorList):
+def construct_dataframe(propList, colorList, folderList):
     # dataframe struct
-    d = {'color0c': [], 
+    d = {
+        'Item': folderList,
+        'color0c': [], 
         'color1c' : [], 
         'color2c' : [],
         'color3c' : [],
@@ -62,20 +64,28 @@ def construct_dataframe(propList, colorList):
 
 propList = []
 colorList = []
+folderList = []
 
-# Image Folder
+# Images Folder
 imgFolder = os.path.join(dirname, 'archiveFruit/fruits-360-original-size/fruits-360-original-size/Training/limitedselection')
 
 # Load images
-for filename in os.listdir(imgFolder):
-    img = load_image(os.path.join(imgFolder, filename))
-    proportions, colors = top_colors(img)
+for root, dirs, files in os.walk(imgFolder):
+    for dir in dirs:
 
-    # append to lists
-    propList.append(proportions)
-    colorList.append(colors)
+        subfolder = os.path.join(imgFolder, dir)
 
-df = construct_dataframe(propList, colorList)
+        for filename in os.listdir(subfolder):
+
+            img = load_image(os.path.join(subfolder, filename))
+            proportions, colors = top_colors(img)
+
+            # append to lists
+            propList.append(proportions)
+            colorList.append(colors)
+            folderList.append(os.path.split(imgFolder)[1])
+
+df = construct_dataframe(propList, colorList, folderList)
 print(df)
 
 
