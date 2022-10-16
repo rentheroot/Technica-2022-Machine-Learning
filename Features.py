@@ -83,7 +83,7 @@ for root, dirs, files in os.walk(imgFolder):
             # append to lists
             propList.append(proportions)
             colorList.append(colors)
-            folderList.append(os.path.split(imgFolder)[1])
+            folderList.append(os.path.split(subfolder)[1])
 
 df = construct_dataframe(propList, colorList, folderList)
 print(df)
